@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">BluetoothComm</string>
+    <string name="parameter_name_1">A</string>
+    <string name="parameter_name_2">B</string>
+    <string name="parameter_name_3">C</string>
+    <string name="parameter_name_4">D</string>
+
 </resources>

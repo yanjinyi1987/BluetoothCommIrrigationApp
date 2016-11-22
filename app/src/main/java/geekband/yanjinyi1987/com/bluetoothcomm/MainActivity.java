@@ -9,18 +9,30 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 import geekband.yanjinyi1987.com.bluetoothcomm.fragment.BluetoothConnection;
 
@@ -34,6 +46,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final int REQUEST_ENABLE_BT=1;
     private ArrayList<String> mConnectedBTDevices = new ArrayList<>();
     private boolean rwReady=false;
+
+    private ArrayList<String> parameter_name = new ArrayList<>();
+    private ArrayList<String> parameter_value = new ArrayList<>();
+    private ArrayList<String> parameter_default_value = new ArrayList<>();
+
+    private ArrayList<ParameterData> parameterDatas = new ArrayList<>();
 
     //与fragmentDialog通信的Handler
     private Handler mMainActivityHandler = new Handler() {
@@ -51,6 +69,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     mSSPRWThread.start();
                     //将功能区使能
                     rwReady=true;
+                    enableViews();
                     break;
                 default:
                     break;
@@ -73,7 +92,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                     String strInfo = stringBuilder.toString();
                     Log.i("MainActivity",strInfo);
-                    mReceivedSPPDataText.setText(mReceivedSPPDataText.getText()+strInfo);
+                    //mReceivedSPPDataText.setText(mReceivedSPPDataText.getText()+strInfo);
+                    //读取远程数据
                     break;
                 default:
                     break;
@@ -118,10 +138,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     };
     private Button mBTConnectionButton;
-    private EditText mAtCommandText;
-    private Button mSendAtCommandButton;
-    private EditText mReceivedSPPDataText;
     private SSPRWThread mSSPRWThread;
+    private Button mReadRemoteDataButton;
+    private Button mSetRemoteDataButton;
+    private ListView mParameterListView;
+    private ParameterArrayAdapter parameterArrayAdapter;
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -217,12 +238,38 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     void initViews()
     {
         mBTConnectionButton = (Button) findViewById(R.id.connect_bt_device);
-        mAtCommandText = (EditText) findViewById(R.id.AT_command_text);
-        mReceivedSPPDataText = (EditText) findViewById(R.id.received_SPP_data_text);
-        mSendAtCommandButton = (Button) findViewById(R.id.send_AT_command);
+        mReadRemoteDataButton = (Button) findViewById(R.id.read_remote_data);
+        mSetRemoteDataButton = (Button) findViewById(R.id.set_remote_data);
 
         mBTConnectionButton.setOnClickListener(this);
-        mSendAtCommandButton.setOnClickListener(this);
+        mReadRemoteDataButton.setOnClickListener(this);
+        mSetRemoteDataButton.setOnClickListener(this);
+
+        mParameterListView = (ListView) findViewById(R.id.parameter_list);
+        //debug 手动设置parameter数据
+        parameterDatas.add(new ParameterData("A:","100","100",1));
+        parameterDatas.add(new ParameterData("B:","100","100",2));
+        parameterDatas.add(new ParameterData("C:","100","100",3));
+        parameterDatas.add(new ParameterData("D:","100","100",4));
+
+        parameterArrayAdapter = new ParameterArrayAdapter(this,
+                R.layout.parameter_item,
+                parameterDatas);
+        mParameterListView.setAdapter(parameterArrayAdapter);
+        disableViews();
+    }
+
+    void enableViews() {
+        Log.i("MainActivity:","enableViews");
+        mReadRemoteDataButton.setEnabled(true);
+        mSetRemoteDataButton.setEnabled(true);
+        mParameterListView.setEnabled(true);
+    }
+
+    void disableViews() {
+        mReadRemoteDataButton.setEnabled(false);
+        mSetRemoteDataButton.setEnabled(false);
+        mParameterListView.setEnabled(false);
     }
     //接受传回的结果肯定是异步的哦！
     @Override
@@ -231,12 +278,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.connect_bt_device:
                 initBluetooth();
                 break;
-            case R.id.send_AT_command:
-                String at_command = mAtCommandText.getText().toString();
-                if(at_command!=null && at_command.length()>0) {
-                    //发送命令
-                    mSSPRWThread.write(at_command.getBytes());
+//            case R.id.send_AT_command:
+//                String at_command = mAtCommandText.getText().toString();
+//                if(at_command!=null && at_command.length()>0) {
+//                    //发送命令
+//                    if(rwReady==true) {
+//                        mSSPRWThread.write(at_command.getBytes());
+//                    }
+//                    else {
+//                        Toast.makeText(this,"没有蓝牙连接",Toast.LENGTH_LONG).show();
+//                    }
+//                }
+//                break;
+            case R.id.read_remote_data:
+                //读取远程数据
+                //更新list
+                parameterArrayAdapter.notifyDataSetChanged();
+                break;
+            case R.id.set_remote_data:
+                //获取远程数据
+                for (int i = 0; i < parameterDatas.size(); i++) {
+                    Log.i("MainActivity","data is "+parameterDatas.get(i).value);
                 }
+
+                //设置远程数据
                 break;
             default:
                 break;
@@ -297,5 +362,79 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 mmSocket.close();
             } catch (IOException e) { }
         }
+    }
+}
+
+class ParameterData{
+    public String name;
+    public String value;
+    public String defaultValue;
+    public int index;
+
+    public ParameterData(String name, String value, String defaultValue, int index) {
+        this.name = name;
+        this.value = value;
+        this.defaultValue = defaultValue;
+        this.index = index;
+    }
+}
+//http://www.webplusandroid.com/creating-listview-with-edittext-and-textwatcher-in-android/
+class ParameterArrayAdapter extends ArrayAdapter<ParameterData> {
+    int resourceId;
+    Context context;
+    List<ParameterData> parameterDatas;
+    public ParameterArrayAdapter(Context context, int resource, List<ParameterData> objects) {
+        super(context, resource, objects);
+        resourceId = resource;
+        this.context = context;
+        parameterDatas = objects;
+    }
+    @NonNull
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        final ParameterData parameterData = getItem(position);
+        View view;
+        final ParentViewHolder parentViewHolder;
+        if(convertView==null) {
+            view = LayoutInflater.from(context).inflate(resourceId,null);
+            parentViewHolder = new ParentViewHolder();
+            parentViewHolder.parameter_name = (TextView) view.findViewById(R.id.parameter_text);
+            parentViewHolder.parameter_value = (EditText) view.findViewById(R.id.parameter_value);
+            parentViewHolder.parameter_default_value = (EditText) view.findViewById(R.id.parameter_default_value);
+            parentViewHolder.parameter_default_value.setKeyListener(null);
+            view.setTag(parentViewHolder);
+        }
+        else {
+            view = convertView;
+            parentViewHolder = (ParentViewHolder) view.getTag();
+        }
+        parentViewHolder.parameter_name.setText(parameterDatas.get(position).name);
+        parentViewHolder.parameter_value.setText(parameterDatas.get(position).value);
+        parentViewHolder.parameter_default_value.setText(parameterDatas.get(position).defaultValue);
+        parentViewHolder.ref = position;
+        parentViewHolder.parameter_value.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                parameterDatas.get(parentViewHolder.ref).value = s.toString();
+            }
+        });
+        return view;
+    }
+
+    class ParentViewHolder {
+        TextView parameter_name;
+        EditText parameter_value;
+        EditText parameter_default_value;
+        int ref;
     }
 }
