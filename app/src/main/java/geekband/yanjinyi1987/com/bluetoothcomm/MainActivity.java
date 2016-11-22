@@ -251,12 +251,40 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         parameterDatas.add(new ParameterData("B:","100","100",2));
         parameterDatas.add(new ParameterData("C:","100","100",3));
         parameterDatas.add(new ParameterData("D:","100","100",4));
+        parameterDatas.add(new ParameterData("A:","100","100",1));
+        parameterDatas.add(new ParameterData("B:","100","100",2));
+        parameterDatas.add(new ParameterData("C:","100","100",3));
+        parameterDatas.add(new ParameterData("D:","100","100",4));
+        parameterDatas.add(new ParameterData("A:","100","100",1));
+        parameterDatas.add(new ParameterData("B:","100","100",2));
+        parameterDatas.add(new ParameterData("C:","100","100",3));
+        parameterDatas.add(new ParameterData("D:","100","100",4));
+        parameterDatas.add(new ParameterData("A:","100","100",1));
+        parameterDatas.add(new ParameterData("B:","100","100",2));
+        parameterDatas.add(new ParameterData("C:","100","100",3));
+        parameterDatas.add(new ParameterData("D:","100","100",4));
+        parameterDatas.add(new ParameterData("A:","100","100",1));
+        parameterDatas.add(new ParameterData("B:","100","100",2));
+        parameterDatas.add(new ParameterData("C:","100","100",3));
+        parameterDatas.add(new ParameterData("D:","100","100",4));
+        parameterDatas.add(new ParameterData("A:","100","100",1));
+        parameterDatas.add(new ParameterData("B:","100","100",2));
+        parameterDatas.add(new ParameterData("C:","100","100",3));
+        parameterDatas.add(new ParameterData("D:","100","100",4));
+        parameterDatas.add(new ParameterData("A:","100","100",1));
+        parameterDatas.add(new ParameterData("B:","100","100",2));
+        parameterDatas.add(new ParameterData("C:","100","100",3));
+        parameterDatas.add(new ParameterData("D:","100","100",4));
+        parameterDatas.add(new ParameterData("A:","100","100",1));
+        parameterDatas.add(new ParameterData("B:","100","100",2));
+        parameterDatas.add(new ParameterData("C:","100","100",3));
+        parameterDatas.add(new ParameterData("D:","100","100",4));
 
         parameterArrayAdapter = new ParameterArrayAdapter(this,
                 R.layout.parameter_item,
                 parameterDatas);
         mParameterListView.setAdapter(parameterArrayAdapter);
-        disableViews();
+        //disableViews();
     }
 
     void enableViews() {
@@ -297,8 +325,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.set_remote_data:
                 //获取远程数据
-                for (int i = 0; i < parameterDatas.size(); i++) {
-                    Log.i("MainActivity","data is "+parameterDatas.get(i).value);
+                for (int i = 0; i < 10; i++) {
+                    Log.i("MainActivity","data "+i+" is "+parameterDatas.get(i).value);
                 }
 
                 //设置远程数据
@@ -391,7 +419,7 @@ class ParameterArrayAdapter extends ArrayAdapter<ParameterData> {
     }
     @NonNull
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
         final ParameterData parameterData = getItem(position);
         View view;
         final ParentViewHolder parentViewHolder;
@@ -401,33 +429,41 @@ class ParameterArrayAdapter extends ArrayAdapter<ParameterData> {
             parentViewHolder.parameter_name = (TextView) view.findViewById(R.id.parameter_text);
             parentViewHolder.parameter_value = (EditText) view.findViewById(R.id.parameter_value);
             parentViewHolder.parameter_default_value = (EditText) view.findViewById(R.id.parameter_default_value);
+            parentViewHolder.sequence_number = (TextView)view.findViewById(R.id.sequence_number);
             parentViewHolder.parameter_default_value.setKeyListener(null);
+            parentViewHolder.parameter_value.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    //由于View的重用，我们会发现text会发生变化，比如我改了第一个，但是重画时，text的值会被
+                    //setText改变，但是此时我们应该改变的是position上的value
+                    Log.i("MainActivity","text changed "+position+" "+s.toString());
+                    parameterDatas.get(parentViewHolder.ref).value = s.toString();
+//                    parameterDatas.get(parentViewHolder.ref).defaultValue = s.toString();
+//                    parentViewHolder.parameter_default_value.setText(s);
+                }
+            });
             view.setTag(parentViewHolder);
         }
         else {
             view = convertView;
             parentViewHolder = (ParentViewHolder) view.getTag();
+            Log.i("MainActivity","position is "+position+" "+parentViewHolder.ref);
         }
+        parentViewHolder.ref = position;
         parentViewHolder.parameter_name.setText(parameterDatas.get(position).name);
         parentViewHolder.parameter_value.setText(parameterDatas.get(position).value);
         parentViewHolder.parameter_default_value.setText(parameterDatas.get(position).defaultValue);
-        parentViewHolder.ref = position;
-        parentViewHolder.parameter_value.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                parameterDatas.get(parentViewHolder.ref).value = s.toString();
-            }
-        });
+        parentViewHolder.sequence_number.setText(String.valueOf(position));
         return view;
     }
 
@@ -435,6 +471,7 @@ class ParameterArrayAdapter extends ArrayAdapter<ParameterData> {
         TextView parameter_name;
         EditText parameter_value;
         EditText parameter_default_value;
+        TextView sequence_number;
         int ref;
     }
 }

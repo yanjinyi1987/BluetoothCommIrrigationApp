@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<instant-run
+    abi="arm64-v8a,armeabi-v7a,armeabi"
+    api-level="22"
+    density="xxhdpi"
+    format="8"
+    plugin-version="2.2.2"
+    timestamp="7694748150405"
+    token="-8349253299322570180"
+    verifier="COLD_SWAP_REQUESTED" >
+
+    <task
+        name="javac"
+        duration="232" />
+    <task
+        name="instant-run-dex"
+        duration="0" />
+    <task
+        name="instant-run-transform"
+        duration="7" />
+    <task
+        name="verifier"
+        duration="0" />
+
+    <artifact
+        location="/home/lexkde/ArduinoProject/BluetoothCommIrrigationApp/app/build/intermediates/transforms/dex/debug/folders/1000/5/slice_2/classes.dex"
+        type="DEX" />
+
+    <build
+        timestamp="721664819173"
+        verifier="FULL_BUILD_REQUESTED" >
+        <artifact
+            location="/home/lexkde/ArduinoProject/BluetoothCommIrrigationApp/app/build/outputs/apk/app-debug.apk"
+            type="MAIN" />
+    </build>
+    <build
+        timestamp="1116513010200"
+        verifier="COLD_SWAP_REQUESTED" >
+        <artifact
+            location="/home/lexkde/ArduinoProject/BluetoothCommIrrigationApp/app/build/intermediates/instant-run-resources/resources-debug.ir.ap_"
+            type="RESOURCES" />
+    </build>
+    <build
+        timestamp="7694748150405"
+        verifier="COLD_SWAP_REQUESTED" >
+        <artifact
+            location="/home/lexkde/ArduinoProject/BluetoothCommIrrigationApp/app/build/intermediates/transforms/dex/debug/folders/1000/5/slice_2/classes.dex"
+            type="DEX" />
+    </build>
+
+</instant-run>

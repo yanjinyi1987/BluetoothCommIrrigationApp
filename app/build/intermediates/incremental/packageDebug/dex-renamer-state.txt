@@ -1,0 +1,7 @@
+#Tue Nov 22 20:06:46 CST 2016
+base.0=/home/lexkde/ArduinoProject/BluetoothCommIrrigationApp/app/build/intermediates/transforms/dex/debug/folders/1000/10/instant-run-bootstrap_57f94e2e1db70b59702388e13ae000d893c83a20
+renamed.1=classes2.dex
+renamed.0=classes.dex
+file.1=/home/lexkde/ArduinoProject/BluetoothCommIrrigationApp/app/build/intermediates/transforms/dex/debug/folders/1000/10/instant-run_f27e60de99721674c28d91a6001fc8cf94c5ba32/classes.dex
+base.1=/home/lexkde/ArduinoProject/BluetoothCommIrrigationApp/app/build/intermediates/transforms/dex/debug/folders/1000/10/instant-run_f27e60de99721674c28d91a6001fc8cf94c5ba32
+file.0=/home/lexkde/ArduinoProject/BluetoothCommIrrigationApp/app/build/intermediates/transforms/dex/debug/folders/1000/10/instant-run-bootstrap_57f94e2e1db70b59702388e13ae000d893c83a20/classes.dex
